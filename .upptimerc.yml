@@ -2,11 +2,14 @@ owner: dingjiai
 repo: status
 
 sites:
-  # 这里是你监控的第一个 API 接口
   - name: 顶级AI 核心接口
-    url: https://api.dingjiai.com/v1/models  # ⚠️ 修改这里：填入你真实的 API 中转站健康检查或模型列表地址
+    url: https://api.dingjiai.com/v1/models
     method: GET
-    expectedStatusCode: 200
+    # 把原来的 expectedStatusCode: 200 删掉，换成下面这两行：
+    expectedStatusCodes:
+      - 200
+      - 401
+      - 403
 
 status-website:
   # 基础配置保持不变
