@@ -5,29 +5,20 @@ sites:
   - name: 顶级AI 核心接口
     url: https://api.dingjiai.com/v1/models
     method: GET
-    # 把原来的 expectedStatusCode: 200 删掉，换成下面这两行：
+    # 👇 这里修复了你 API 需要 Key 导致的报错问题
     expectedStatusCodes:
       - 200
       - 401
       - 403
 
 status-website:
-  # 基础配置保持不变
   cname: status.dingjiai.com
   name: 顶级AI 运行状态墙
   introTitle: "🟢 **顶级AI** API 服务实时监控"
   introMessage: "这里实时展示我们 API 中转站的连通性和历史延迟数据。系统每 5 分钟自动检测一次，确保服务高可用。"
-  
-  # 1. 🌈 修改主题（强烈推荐）
-  # 可选值：light (亮色), dark (暗黑模式，通常看起来更专业), night (极夜模式)
   theme: dark
-
-  # 2. 🖼️ 添加你自己的 Logo 和 图标 (把网址换成你真实的图片链接)
-  # 如果你还没有在线的 logo 链接，这两行可以先删掉或者用 // 注释掉
-  logoUrl: https://www.dingjiai.com/logo.png  # 显示在左上角的大 Logo
-  favicon: https://www.dingjiai.com/favicon.ico # 浏览器标签页上的小图标
-
-  # 3. 🧭 添加顶部导航栏 (非常实用，方便用户点回去你的主站)
+  logoUrl: https://www.dingjiai.com/logo.png
+  favicon: https://www.dingjiai.com/favicon.ico
   navbar:
     - title: 🏠 官网主页
       url: https://www.dingjiai.com
