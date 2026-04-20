@@ -9,11 +9,26 @@ sites:
     expectedStatusCode: 200
 
 status-website:
-  # ⚠️ 修改这里：填入你准备用来展示状态的那个子域名
+  # 基础配置保持不变
   cname: status.dingjiai.com
+  name: 顶级AI 运行状态墙
+  introTitle: "🟢 **顶级AI** API 服务实时监控"
+  introMessage: "这里实时展示我们 API 中转站的连通性和历史延迟数据。系统每 5 分钟自动检测一次，确保服务高可用。"
   
-  # 状态页面的展示信息
-  name: 顶级AI 接口运行状态
-  introTitle: "**顶级AI** API 服务实时监控"
-  introMessage: "这里展示了我们 API 中转站的实时连通性和历史响应延迟数据。每 5 分钟更新一次。"
-  theme: light
+  # 1. 🌈 修改主题（强烈推荐）
+  # 可选值：light (亮色), dark (暗黑模式，通常看起来更专业), night (极夜模式)
+  theme: dark
+
+  # 2. 🖼️ 添加你自己的 Logo 和 图标 (把网址换成你真实的图片链接)
+  # 如果你还没有在线的 logo 链接，这两行可以先删掉或者用 // 注释掉
+  logoUrl: https://www.dingjiai.com/logo.png  # 显示在左上角的大 Logo
+  favicon: https://www.dingjiai.com/favicon.ico # 浏览器标签页上的小图标
+
+  # 3. 🧭 添加顶部导航栏 (非常实用，方便用户点回去你的主站)
+  navbar:
+    - title: 🏠 官网主页
+      url: https://www.dingjiai.com
+    - title: 🚀 立即调用 API
+      url: https://api.dingjiai.com
+    - title: 📖 开发文档
+      url: https://www.dingjiai.com/docs
