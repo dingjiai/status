@@ -5,11 +5,8 @@ sites:
   - name: 顶级AI 核心接口
     url: https://api.dingjiai.com/v1/models
     method: GET
-    expectedStatusCodes:
-      - 200
-      - 401
-      - 403
+    # 把之前带 s 的多行删掉，只留这一行，严格匹配 401
+    expectedStatusCode: 401
 
-# 注意看下面，我把状态页配置删减到了最少，并且去掉了 cname
 status-website:
   name: 顶级AI 运行状态墙
