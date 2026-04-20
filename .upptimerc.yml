@@ -5,7 +5,8 @@ sites:
   - name: 顶级AI 核心接口
     url: https://api.dingjiai.com/v1/models
     method: GET
-    # 【解毒1】正确的官方数组写法，完美放行你带密码验证的接口
+    # 👇 这里设置监控项文字前面的小图标
+    icon: https://raw.githubusercontent.com/dingjiai/status/refs/heads/master/favicon.ico
     expectedStatusCodes: 
       - 200
       - 401
@@ -14,14 +15,13 @@ sites:
 status-website:
   cname: status.dingjiai.com
   name: 顶级AI 运行状态墙
+  # 👇 这里设置左上角 Logo 和浏览器标签页小图标
+  logoUrl: https://raw.githubusercontent.com/dingjiai/status/refs/heads/master/favicon.ico
+  theme: night
   introTitle: "🟢 **顶级AI** API 服务实时监控"
   introMessage: "这里实时展示我们 API 中转站的连通性和历史延迟数据。系统每 5 分钟自动检测一次，确保服务高可用。"
-  theme: night  # 官方暗黑模式的标准名字是 night
-  logoUrl: https://www.dingjiai.com/logo.png
-  # 【解毒2】已经删除了不支持的 favicon 字段
   
   navbar:
-    # 【解毒3】严格按照官方语法，把 url 全部改成了 href！
     - title: 🏠 官网主页
       href: https://www.dingjiai.com
     - title: 🚀 立即调用 API
