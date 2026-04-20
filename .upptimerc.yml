@@ -5,24 +5,11 @@ sites:
   - name: 顶级AI 核心接口
     url: https://api.dingjiai.com/v1/models
     method: GET
-    # 👇 这里修复了你 API 需要 Key 导致的报错问题
     expectedStatusCodes:
       - 200
       - 401
       - 403
 
+# 注意看下面，我把状态页配置删减到了最少，并且去掉了 cname
 status-website:
-  cname: status.dingjiai.com
   name: 顶级AI 运行状态墙
-  introTitle: "🟢 **顶级AI** API 服务实时监控"
-  introMessage: "这里实时展示我们 API 中转站的连通性和历史延迟数据。系统每 5 分钟自动检测一次，确保服务高可用。"
-  theme: dark
-  logoUrl: https://www.dingjiai.com/logo.png
-  favicon: https://www.dingjiai.com/favicon.ico
-  navbar:
-    - title: 🏠 官网主页
-      url: https://www.dingjiai.com
-    - title: 🚀 立即调用 API
-      url: https://api.dingjiai.com
-    - title: 📖 开发文档
-      url: https://www.dingjiai.com/docs
