@@ -1,0 +1,125 @@
+name: Pages Guard
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: pages-guard
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+    env:
+      REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ github.token }}
+      EXPECTED_BRANCH: master
+      EXPECTED_PATH: /
+    steps:
+      - name: Inspect pages state
+        id: inspect
+        run: |
+          set -euo pipefail
+          status=$(curl -sS -o pages.json -w "%{http_code}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            "https://api.github.com/repos/${REPO}/pages")
+
+          repair=0
+          mode=update
+
+          if [ "$status" = "404" ]; then
+            repair=1
+            mode=create
+          elif [ "$status" = "200" ]; then
+            python - <<'PY'
+            import json
+
+            data = json.load(open("pages.json", encoding="utf-8"))
+            branch = data.get("source", {}).get("branch")
+            path = data.get("source", {}).get("path")
+            repair = int(branch != "master" or path != "/")
+            print(f"repair={repair}")
+            PY
+            if ! python - <<'PY'
+import json, sys
+
+data = json.load(open("pages.json", encoding="utf-8"))
+branch = data.get("source", {}).get("branch")
+path = data.get("source", {}).get("path")
+sys.exit(0 if (branch == "master" and path == "/") else 1)
+PY
+            then
+              repair=1
+              mode=update
+            fi
+          else
+            echo "Unexpected Pages API status: $status"
+            cat pages.json
+            exit 1
+          fi
+
+          echo "repair=$repair" >> "$GITHUB_OUTPUT"
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+
+      - name: Auto-heal pages source
+        if: steps.inspect.outputs.repair == '1'
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.inspect.outputs.mode }}" = "create" ]; then
+            code=$(curl -sS -o repair.json -w "%{http_code}" \
+              -X POST \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "https://api.github.com/repos/${REPO}/pages" \
+              -d '{"source":{"branch":"master","path":"/"}}')
+          else
+            code=$(curl -sS -o repair.json -w "%{http_code}" \
+              -X PUT \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Content-Type: application/json" \
+              "https://api.github.com/repos/${REPO}/pages" \
+              -d '{"source":{"branch":"master","path":"/"}}')
+          fi
+
+          if [ "$code" -lt 200 ] || [ "$code" -ge 300 ]; then
+            echo "Auto-heal failed with HTTP $code"
+            cat repair.json
+            exit 1
+          fi
+
+      - name: Verify public endpoints
+        run: |
+          set -euo pipefail
+          urls=(
+            "https://dingjiai.github.io/status/"
+            "https://status.dingjiai.com/"
+          )
+
+          for i in 1 2 3 4 5 6; do
+            all_ok=1
+            for url in "${urls[@]}"; do
+              code=$(curl -sS -o /tmp/body -w "%{http_code}" -L --max-redirs 5 "$url")
+              if [ "$code" -lt 200 ] || [ "$code" -ge 400 ]; then
+                all_ok=0
+                echo "Attempt $i: $url -> HTTP $code"
+              else
+                echo "Attempt $i: $url -> HTTP $code"
+              fi
+            done
+
+            if [ "$all_ok" = "1" ]; then
+              exit 0
+            fi
+            sleep 20
+          done
+
+          echo "Endpoint verification failed after auto-heal attempts"
+          exit 1

@@ -11,6 +11,8 @@ on:
 jobs:
   health_check_job:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     name: Check all sites
     steps:
       - uses: actions/checkout@v4
