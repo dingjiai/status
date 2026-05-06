@@ -32,10 +32,15 @@ do
   url="${URLSARRAY[index]}"
   echo "  $key=$url"
 
+  response="000"
+  result="failed"
   for i in 1 2 3 4; 
   do
-    response=$(curl --write-out '%{http_code}' --silent --output /dev/null $url)
-    if [ "$response" -eq 200 ] || [ "$response" -eq 202 ] || [ "$response" -eq 301 ] || [ "$response" -eq 302 ] || [ "$response" -eq 307 ] || [ "$response" -eq 401 ] || [ "$response" -eq 403 ]; then
+    response=$(curl --connect-timeout 10 --max-time 30 --write-out '%{http_code}' --silent --output /dev/null "$url" || true)
+    if [[ -z "$response" ]]; then
+      response="000"
+    fi
+    if [[ "$response" =~ ^(200|202|301|302|307|401|403)$ ]]; then
       result="success"
     else
       result="failed"
@@ -45,14 +50,42 @@ do
     fi
     sleep 5
   done
+
+  reportFile="logs/${key}_report.log"
+  previousFailures=0
+  if [[ -f "$reportFile" ]]
+  then
+    previousLine=$(tail -1 "$reportFile")
+    if [[ "$previousLine" =~ consecutive_failures=([0-9]+) ]]
+    then
+      previousFailures="${BASH_REMATCH[1]}"
+    elif [[ "$previousLine" =~ failed|suspected ]]
+    then
+      previousFailures=1
+    fi
+  fi
+
+  if [ "$result" = "success" ]; then
+    consecutiveFailures=0
+    finalResult="success"
+  else
+    consecutiveFailures=$((previousFailures + 1))
+    if [ "$consecutiveFailures" -ge 3 ]; then
+      finalResult="failed"
+    else
+      finalResult="suspected"
+    fi
+  fi
+
   dateTime=$(date +'%Y-%m-%d %H:%M')
+  logLine="$dateTime, $finalResult, http=$response, consecutive_failures=$consecutiveFailures"
   if [[ $commit == true ]]
   then
-    echo $dateTime, $result >> "logs/${key}_report.log"
+    echo "$logLine" >> "$reportFile"
     # By default we keep 2000 last log entries.  Feel free to modify this to meet your needs.
-    echo "$(tail -2000 logs/${key}_report.log)" > "logs/${key}_report.log"
+    echo "$(tail -2000 "$reportFile")" > "$reportFile"
   else
-    echo "    $dateTime, $result"
+    echo "    $logLine"
   fi
 done
 
