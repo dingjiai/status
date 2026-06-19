@@ -774,3 +774,4 @@
 2026-06-19 14:28, failed, http=000, consecutive_failures=403
 2026-06-19 16:57, failed, http=000, consecutive_failures=404
 2026-06-19 18:50, failed, http=000, consecutive_failures=405
+2026-06-19 20:21, failed, http=000, consecutive_failures=406
