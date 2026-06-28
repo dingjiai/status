@@ -871,3 +871,4 @@
 2026-06-28 04:51, failed, http=000, consecutive_failures=500
 2026-06-28 08:13, failed, http=000, consecutive_failures=501
 2026-06-28 10:34, failed, http=000, consecutive_failures=502
+2026-06-28 12:05, failed, http=000, consecutive_failures=503
